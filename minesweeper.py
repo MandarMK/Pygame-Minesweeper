@@ -24,6 +24,7 @@ FPS = 10
 gameDisplay = pygame.display.set_mode((display_width,display_width))
 pygame.display.set_caption('Minesweeper')
 font = pygame.font.SysFont("monospace", 40)
+flagImg = pygame.image.load('flag.png')
 
 class Tile:
     def __init__(self):
@@ -170,6 +171,9 @@ def Draw():
                     pygame.draw.rect(gameDisplay, white, [x * block_width, y * block_width, block_width, block_width])
                 else:
                     pygame.draw.rect(gameDisplay, dgrey, [x * block_width, y * block_width, block_width, block_width])
+                    if grid[y][x].flag == True:
+                        gameDisplay.blit(flagImg, [x * block_width, y * block_width,block_width, block_width])
+
             pygame.draw.rect(gameDisplay, black, [x * block_width, y * block_width, block_width, block_width], 2)
 
             if grid[y][x].neighbours != 0 and grid[y][x].neighbours != 10 and grid[y][x].visible:
@@ -189,11 +193,10 @@ def GameLoop():
         gameDisplay.fill(white)
 
         for event in pygame.event.get():
-            print(event)
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
-            if event.type == pygame.MOUSEBUTTONUP:
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 mouseX,mouseY = event.pos
                 col=int(mouseX/block_width)
                 row=int(mouseY/block_width)
@@ -202,6 +205,13 @@ def GameLoop():
                         Search(row,col)
                 else:
                     EndGame()
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
+                mouseX,mouseY = event.pos
+                col=int(mouseX/block_width)
+                row=int(mouseY/block_width)
+                if grid[row][col].visible == False:
+                    grid[row][col].flag = True
+
         if CountHidden() == numBombs:
             WinGame()
         Draw()
